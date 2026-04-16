@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuários — Microserviços Demo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0A1628; color: #E2E8F0; min-height: 100vh; }
+        header { background: linear-gradient(135deg, #0F52BA 0%, #0A1628 100%);
+            padding: 20px 40px; border-bottom: 2px solid #00D4FF;
+            display: flex; align-items: center; justify-content: space-between; }
+        header h1 { font-size: 1.5rem; color: #fff; }
+        .back-btn { color: #00D4FF; text-decoration: none; font-size: 0.9rem;
+            border: 1px solid #00D4FF; padding: 6px 16px; border-radius: 6px; }
+
+        .container { max-width: 900px; margin: 36px auto; padding: 0 24px; }
+
+        .info-banner { background: #0D2040; border-left: 4px solid #8B5CF6;
+            padding: 14px 20px; border-radius: 8px; margin-bottom: 28px; font-size: 0.88rem; color: #A0B4C8; }
+        .info-banner strong { color: #8B5CF6; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+        .card { background: #0D2040; border-radius: 12px; padding: 24px;
+            border: 1px solid #1E3A5F; display: flex; align-items: center; gap: 16px; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, #8B5CF6, #0F52BA);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .card-info h3 { font-size: 1rem; color: #fff; margin-bottom: 4px; }
+        .card-info p { font-size: 0.82rem; color: #64748B; }
+        .card-info .id { font-size: 0.72rem; color: #334155; margin-top: 4px; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>👤 usuario-service <span style="font-size:0.8rem;color:#00D4FF;margin-left:8px;">porta 8083</span></h1>
+    <a href="/" class="back-btn">← Painel Principal</a>
+</header>
+
+<div class="container">
+    <div class="info-banner">
+        <strong>🔍 Conceito demonstrado:</strong> O usuario-service roda na <strong>porta 8083</strong>
+        com seu próprio banco H2 completamente isolado dos outros serviços.
+        Console H2: <strong>http://localhost:8083/h2-console</strong>
+    </div>
+
+    <div class="grid">
+        <div th:each="usuario : ${usuarios}" class="card">
+            <div class="avatar" th:text="${#strings.substring(usuario['nome'], 0, 1)}">A</div>
+            <div class="card-info">
+                <h3 th:text="${usuario['nome']}">Nome</h3>
+                <p th:text="${usuario['email']}">email@email.com</p>
+                <p class="id" th:text="'ID: ' + ${usuario['id']}">ID: 1</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

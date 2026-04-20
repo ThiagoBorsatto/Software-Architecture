@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Produtos — Microserviços Demo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0A1628; color: #E2E8F0; min-height: 100vh; }
+        header { background: linear-gradient(135deg, #0F52BA 0%, #0A1628 100%);
+            padding: 20px 40px; border-bottom: 2px solid #00D4FF;
+            display: flex; align-items: center; justify-content: space-between; }
+        header h1 { font-size: 1.5rem; color: #fff; }
+        .back-btn { color: #00D4FF; text-decoration: none; font-size: 0.9rem;
+            border: 1px solid #00D4FF; padding: 6px 16px; border-radius: 6px; }
+        .back-btn:hover { background: rgba(0,212,255,0.1); }
+
+        .container { max-width: 1100px; margin: 36px auto; padding: 0 24px; }
+
+        .info-banner { background: #0D2040; border-left: 4px solid #00D4FF;
+            padding: 14px 20px; border-radius: 8px; margin-bottom: 28px; font-size: 0.88rem; color: #A0B4C8; }
+        .info-banner strong { color: #00D4FF; }
+
+        .offline-banner { background: rgba(239,68,68,0.1); border-left: 4px solid #EF4444;
+            padding: 14px 20px; border-radius: 8px; margin-bottom: 28px; color: #FCA5A5; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+
+        .card { background: #0D2040; border-radius: 12px; padding: 24px;
+            border: 1px solid #1E3A5F; transition: all 0.2s; }
+        .card:hover { border-color: #0F52BA; transform: translateY(-2px); }
+        .card .tag { display: inline-block; font-size: 0.72rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;
+            background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid #10B981; }
+        .card h3 { font-size: 1rem; color: #fff; margin-bottom: 8px; }
+        .card .desc { font-size: 0.82rem; color: #64748B; margin-bottom: 16px; line-height: 1.5; }
+        .card .price { font-size: 1.4rem; font-weight: 700; color: #00D4FF; margin-bottom: 8px; }
+        .card .estoque { font-size: 0.8rem; color: #64748B; }
+        .card .estoque span { color: #F59E0B; font-weight: 600; }
+
+        .empty { text-align: center; padding: 60px; color: #334155; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>📦 produto-service <span style="font-size:0.8rem;color:#00D4FF;margin-left:8px;">porta 8081</span></h1>
+    <a href="/" class="back-btn">← Painel Principal</a>
+</header>
+
+<div class="container">
+
+    <div class="info-banner">
+        <strong>🔍 Conceito demonstrado:</strong> Esta página consulta o <strong>produto-service (porta 8081)</strong>
+        via API Gateway. O produto-service tem seu <strong>próprio banco H2</strong> isolado.
+        Console H2: <strong>http://localhost:8081/h2-console</strong>
+    </div>
+
+    <div th:if="${!servicoOnline}" class="offline-banner">
+        ⚠️ <strong>produto-service OFFLINE.</strong> Este é o Circuit Breaker em ação —
+        o Gateway retornou uma resposta degradada sem derrubar o sistema todo.
+    </div>
+
+    <div th:if="${produtos.empty and servicoOnline}" class="empty">
+        <p>Nenhum produto cadastrado.</p>
+    </div>
+
+    <div class="grid">
+        <div th:each="produto : ${produtos}" class="card">
+            <span class="tag">PRODUTO</span>
+            <h3 th:text="${produto['nome']}">Nome do Produto</h3>
+            <p class="desc" th:text="${produto['descricao']}">Descrição</p>
+            <div class="price" th:text="'R$ ' + ${#numbers.formatDecimal(produto['preco'], 1, 2)}">R$ 0,00</div>
+            <div class="estoque">Estoque: <span th:text="${produto['estoque']}">0</span> unidades</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

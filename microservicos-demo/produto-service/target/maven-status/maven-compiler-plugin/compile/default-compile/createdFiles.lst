@@ -1,0 +1,5 @@
+com\demo\produto\controller\ProdutoController.class
+com\demo\produto\model\Produto.class
+com\demo\produto\service\ProdutoService.class
+com\demo\produto\repository\ProdutoRepository.class
+com\demo\produto\ProdutoServiceApplication.class

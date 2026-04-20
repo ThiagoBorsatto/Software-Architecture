@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedidos — Microserviços Demo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0A1628; color: #E2E8F0; min-height: 100vh; }
+        header { background: linear-gradient(135deg, #0F52BA 0%, #0A1628 100%);
+            padding: 20px 40px; border-bottom: 2px solid #00D4FF;
+            display: flex; align-items: center; justify-content: space-between; }
+        header h1 { font-size: 1.5rem; color: #fff; }
+        .back-btn { color: #00D4FF; text-decoration: none; font-size: 0.9rem;
+            border: 1px solid #00D4FF; padding: 6px 16px; border-radius: 6px; }
+
+        .container { max-width: 1100px; margin: 36px auto; padding: 0 24px; }
+
+        .info-banner { background: #0D2040; border-left: 4px solid #F59E0B;
+            padding: 14px 20px; border-radius: 8px; margin-bottom: 28px; font-size: 0.88rem; color: #A0B4C8; }
+        .info-banner strong { color: #F59E0B; }
+
+        .sucesso-banner { background: rgba(16,185,129,0.1); border-left: 4px solid #10B981;
+            padding: 14px 20px; border-radius: 8px; margin-bottom: 20px; color: #6EE7B7; }
+        .erro-banner { background: rgba(239,68,68,0.1); border-left: 4px solid #EF4444;
+            padding: 14px 20px; border-radius: 8px; margin-bottom: 20px; color: #FCA5A5; }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1.5fr; gap: 28px; }
+
+        /* Formulário */
+        .form-card { background: #0D2040; border-radius: 12px; padding: 28px;
+            border: 1px solid #1E3A5F; height: fit-content; }
+        .form-card h2 { font-size: 1.1rem; color: #fff; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.82rem; color: #A0B4C8; margin-bottom: 6px; }
+        .form-group select, .form-group input {
+            width: 100%; padding: 10px 14px; background: #0A1628;
+            border: 1px solid #1E3A5F; border-radius: 8px; color: #E2E8F0;
+            font-size: 0.9rem; outline: none; }
+        .form-group select:focus, .form-group input:focus { border-color: #0F52BA; }
+        .submit-btn { width: 100%; padding: 12px; background: #0F52BA; color: #fff;
+            border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
+            cursor: pointer; margin-top: 8px; }
+        .submit-btn:hover { background: #1E40AF; }
+
+        .flow-mini { background: #0A1628; border-radius: 8px; padding: 12px 16px;
+            margin-top: 16px; font-size: 0.78rem; color: #64748B; line-height: 1.8; }
+        .flow-mini strong { color: #00D4FF; }
+
+        /* Tabela de pedidos */
+        .pedidos-card { background: #0D2040; border-radius: 12px; padding: 28px;
+            border: 1px solid #1E3A5F; }
+        .pedidos-card h2 { font-size: 1.1rem; color: #fff; margin-bottom: 20px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; padding: 10px 12px; color: #64748B;
+            border-bottom: 1px solid #1E3A5F; font-weight: 600; font-size: 0.78rem;
+            text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 12px 12px; border-bottom: 1px solid #0A1628; color: #E2E8F0; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700; }
+        .badge.confirmado { background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid #10B981; }
+        .badge.cancelado { background: rgba(239,68,68,0.15); color: #EF4444; border: 1px solid #EF4444; }
+        .badge.criado { background: rgba(245,158,11,0.15); color: #F59E0B; border: 1px solid #F59E0B; }
+
+        .empty { text-align: center; padding: 40px; color: #334155; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>🛒 pedido-service <span style="font-size:0.8rem;color:#00D4FF;margin-left:8px;">porta 8082</span></h1>
+    <a href="/" class="back-btn">← Painel Principal</a>
+</header>
+
+<div class="container">
+
+    <div class="info-banner">
+        <strong>⚡ Conceito demonstrado:</strong> Criar um pedido dispara chamadas REST para
+        <strong>produto-service :8081</strong> (valida produto e estoque) e
+        <strong>usuario-service :8083</strong> (valida usuário). Cada serviço tem seu banco H2 isolado.
+    </div>
+
+    <div th:if="${param.sucesso}" class="sucesso-banner">
+        ✅ Pedido criado com sucesso! O pedido-service consultou produto-service e usuario-service via REST.
+    </div>
+    <div th:if="${param.erro}" class="erro-banner">
+        ❌ Erro ao criar pedido. Verifique se todos os serviços estão online.
+    </div>
+
+    <div class="two-col">
+        <!-- Formulário -->
+        <div class="form-card">
+            <h2>🆕 Novo Pedido</h2>
+            <form action="/pedidos/criar" method="post">
+                <div class="form-group">
+                    <label>Produto</label>
+                    <select name="produtoId" required>
+                        <option value="">Selecione um produto...</option>
+                        <option th:each="p : ${produtos}"
+                                th:value="${p['id']}"
+                                th:text="${p['nome']} + ' — R$ ' + ${#numbers.formatDecimal(p['preco'], 1, 2)}">
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <select name="usuarioId" required>
+                        <option value="">Selecione um usuário...</option>
+                        <option th:each="u : ${usuarios}"
+                                th:value="${u['id']}"
+                                th:text="${u['nome']} + ' (' + ${u['email']} + ')'">
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade</label>
+                    <input type="number" name="quantidade" value="1" min="1" max="10" required/>
+                </div>
+                <button type="submit" class="submit-btn">Criar Pedido →</button>
+            </form>
+
+            <div class="flow-mini">
+                <strong>Fluxo ao clicar "Criar Pedido":</strong><br>
+                1. Gateway :8080 recebe o POST<br>
+                2. pedido-service :8082 é chamado<br>
+                3. Consulta produto-service :8081<br>
+                4. Consulta usuario-service :8083<br>
+                5. Salva no banco H2 do pedido-service<br>
+                6. Atualiza estoque no produto-service
+            </div>
+        </div>
+
+        <!-- Lista de pedidos -->
+        <div class="pedidos-card">
+            <h2>📋 Pedidos Realizados</h2>
+            <div th:if="${pedidos.empty}" class="empty">
+                <p>Nenhum pedido ainda. Crie o primeiro!</p>
+            </div>
+            <table th:if="${!pedidos.empty}">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Produto</th>
+                    <th>Usuário</th>
+                    <th>Qtd</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pedido : ${pedidos}">
+                    <td th:text="${pedido['id']}">1</td>
+                    <td th:text="${pedido['nomeProduto']}">Produto</td>
+                    <td th:text="${pedido['nomeUsuario']}">Usuário</td>
+                    <td th:text="${pedido['quantidade']}">1</td>
+                    <td th:text="'R$ ' + ${#numbers.formatDecimal(pedido['valorTotal'], 1, 2)}">R$ 0,00</td>
+                    <td>
+                        <span th:class="'badge ' + ${pedido['status'].toLowerCase()}"
+                              th:text="${pedido['status']}">STATUS</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

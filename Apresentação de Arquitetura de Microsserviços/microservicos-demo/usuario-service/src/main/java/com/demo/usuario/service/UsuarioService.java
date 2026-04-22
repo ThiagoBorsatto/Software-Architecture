@@ -1,12 +1,13 @@
 package com.demo.usuario.service;
 
-import com.demo.usuario.model.Usuario;
-import com.demo.usuario.repository.UsuarioRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.demo.usuario.model.Usuario;
+import com.demo.usuario.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
@@ -20,6 +21,7 @@ public class UsuarioService {
             repository.save(new Usuario("Ana Silva", "ana@email.com"));
             repository.save(new Usuario("Bruno Costa", "bruno@email.com"));
             repository.save(new Usuario("Carla Mendes", "carla@email.com"));
+            repository.save(new Usuario("Thiago Borsatto", "thiago@email.com"));
             System.out.println("[usuario-service] ✅ Usuários de exemplo carregados!");
         }
     }
